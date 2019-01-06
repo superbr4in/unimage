@@ -20,12 +20,13 @@ namespace Unimage
 
         public string[] Illustrate()
         {
-            var width = Values.Max(shapes => shapes.Max(shape => shape.XPos + shape.XSize));
-            var height = Values.Max(shapes => shapes.Max(shape => shape.YPos + shape.YSize));
+            var size = new Vector(
+                Values.Max(shapes => shapes.Max(shape => shape.Position.X + shape.Size.X)),
+                Values.Max(shapes => shapes.Max(shape => shape.Position.Y + shape.Size.Y)));
 
-            var illustration = new StringBuilder[height];
-            for (var y = 0; y < height; y++)
-                illustration[y] = new StringBuilder(new string(' ', width));
+            var illustration = new StringBuilder[size.Y];
+            for (var y = 0; y < size.Y; y++)
+                illustration[y] = new StringBuilder(new string(' ', size.X));
 
             foreach (var shapes in Values)
             {
@@ -33,9 +34,9 @@ namespace Unimage
                 {
                     var shapeIllustration = shape.Illustrate();
 
-                    for (var x = 0; x < shape.XSize; x++)
-                    for (var y = 0; y < shape.YSize; y++)
-                        illustration[shape.YPos + y][shape.XPos + x] = shapeIllustration[x, y];
+                    for (var x = 0; x < shape.Size.X; x++)
+                    for (var y = 0; y < shape.Size.Y; y++)
+                        illustration[shape.Position.Y + y][shape.Position.X + x] = shapeIllustration[x, y];
                 }
             }
 

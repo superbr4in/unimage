@@ -4,21 +4,15 @@ namespace Unimage
 {
     public abstract class TextShape
     {
-        public int XPos { get; }
-        public int YPos { get; }
+        public Vector Position { get; }
 
-        public int XSize { get; }
-        public int YSize { get; }
+        public Vector Size { get; }
 
-        protected TextShape(
-            int xPos, int yPos,
-            int xSize, int ySize)
+        protected TextShape(Vector position, Vector size)
         {
-            XPos = xPos;
-            YPos = yPos;
+            Position = position;
 
-            XSize = xSize;
-            YSize = ySize;
+            Size = size;
         }
 
         public abstract char[,] Illustrate();
@@ -40,54 +34,53 @@ namespace Unimage
         public char VLine { get; set; }
 
         public TextRectangle(
-            int xPos, int yPos,
+            Vector position,
             string[] content)
             : base(
-                xPos, yPos,
-                content.Max(line => line.Length) + 2 * MARGIN_SIZE + 2, content.Length + 2)
+                position,
+                new Vector(
+                    content.Max(line => line.Length) + 2 * MARGIN_SIZE + 2,
+                    content.Length + 2))
         {
             _content = content;
         }
 
         public override char[,] Illustrate()
         {
-            var illustration = new char[XSize, YSize];
+            var illustration = new char[Size.X, Size.Y];
 
-            illustration[        0,         0] = TopLeft;
-            illustration[        0, YSize - 1] = BottomLeft;
-            illustration[XSize - 1,         0] = TopRight;
-            illustration[XSize - 1, YSize - 1] = BottomRight;
+            illustration[         0,          0] = TopLeft;
+            illustration[         0, Size.Y - 1] = BottomLeft;
+            illustration[Size.X - 1,          0] = TopRight;
+            illustration[Size.X - 1, Size.Y - 1] = BottomRight;
 
-            for (var x = 1; x < XSize - 1; x++)
+            for (var x = 1; x < Size.X - 1; x++)
             {
-                illustration[x,         0] = HLine;
-                illustration[x, YSize - 1] = HLine;
+                illustration[x,          0] = HLine;
+                illustration[x, Size.Y - 1] = HLine;
             }
-            for (var y = 1; y < YSize - 1; y++)
+            for (var y = 1; y < Size.Y - 1; y++)
             {
-                illustration[        0, y] = VLine;
-                illustration[XSize - 1, y] = VLine;
+                illustration[         0, y] = VLine;
+                illustration[Size.X - 1, y] = VLine;
 
                 for (var m = 0; m < MARGIN_SIZE; m++)
                 {
-                    illustration[        m + 1, y] = ' ';
-                    illustration[XSize - m - 2, y] = ' ';
+                    illustration[         m + 1, y] = ' ';
+                    illustration[Size.X - m - 2, y] = ' ';
                 }
             }
 
-            var contentXStart = MARGIN_SIZE + 1;
-            var contentYStart = 1;
+            var contentStart = new Vector(MARGIN_SIZE + 1, 1);
+            var contentEnd = new Vector(Size.X - MARGIN_SIZE - 2, Size.Y - 2);
 
-            var contentXEnd = XSize - MARGIN_SIZE - 2;
-            var contentYEnd = YSize - 2;
-
-            for (var y = contentYStart; y <= contentYEnd; y++)
+            for (var y = contentStart.Y; y <= contentEnd.Y; y++)
             {
-                var line = _content[y - contentYStart];
+                var line = _content[y - contentStart.Y];
 
-                for (var x = contentXStart; x <= contentXEnd; x++)
+                for (var x = contentStart.X; x <= contentEnd.X; x++)
                 {
-                    var column = x - contentXStart;
+                    var column = x - contentStart.X;
                     illustration[x, y] = column < line.Length ? line[column] : ' ';
                 }
             }
