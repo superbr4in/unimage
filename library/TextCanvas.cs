@@ -11,24 +11,29 @@ namespace Unimage
             get
             {
                 List<TextShape> shapes;
-                if (!TryGetValue(key, out shapes))
-                    Add(key, shapes = new List<TextShape>());
+                if (!base.TryGetValue(key, out shapes))
+                    base.Add(key, shapes = new List<TextShape>());
 
                 return shapes;
             }
         }
 
+        public void Add(double layer, IEnumerable<TextShape> shapes)
+        {
+            base.Add(layer, shapes.ToList());
+        }
+
         public string[] Illustrate()
         {
             var size = new Vector(
-                Values.Max(shapes => shapes.Max(shape => shape.Position.X + shape.Size.X)),
-                Values.Max(shapes => shapes.Max(shape => shape.Position.Y + shape.Size.Y)));
+                base.Values.Max(shapes => shapes.Max(shape => shape.Position.X + shape.Size.X)),
+                base.Values.Max(shapes => shapes.Max(shape => shape.Position.Y + shape.Size.Y)));
 
             var illustration = new StringBuilder[size.Y];
             for (var y = 0; y < size.Y; y++)
                 illustration[y] = new StringBuilder(new string(' ', size.X));
 
-            foreach (var shapes in Values)
+            foreach (var shapes in base.Values)
             {
                 foreach (var shape in shapes)
                 {
