@@ -4,7 +4,7 @@ namespace Unimage
 {
     public abstract class TextShape
     {
-        public Vector Position { get; }
+        public Vector Position { get; set; }
 
         public Vector Size { get; }
 
