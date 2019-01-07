@@ -16,7 +16,15 @@ namespace Unimage
             Size = size;
         }
 
-        public abstract char[,] Illustrate();
+        protected abstract void Illustrate(char[,] illustration);
+
+        internal char[,] Illustrate()
+        {
+            var illustration = new char[Size.X, Size.Y];
+            Illustrate(illustration);
+
+            return illustration;
+        }
     }
 
     public class TextDot : TextShape
@@ -26,13 +34,9 @@ namespace Unimage
         public TextDot(Vector position)
             : base (position, new Vector(1, 1)) { }
 
-        public override char[,] Illustrate()
+        protected override void Illustrate(char[,] illustration)
         {
-            var illustration = new char[1, 1];
-
             illustration[0, 0] = ChBdy;
-
-            return illustration;
         }
     }
 
@@ -48,17 +52,13 @@ namespace Unimage
                 position + (length < 0 ? new Vector(length + 1, 0) : Vector.Zero),
                 new Vector(Math.Abs(length), 1)) { }
 
-        public override char[,] Illustrate()
+        protected override void Illustrate(char[,] illustration)
         {
-            var illustration = new char[Size.X, 1];
-
             for (var x = 1; x < Size.X - 1; x++)
                 illustration[x, 0] = ChHrz;
 
             illustration[Size.X - 1, 0] = ChRgt;
             illustration[         0, 0] = ChLft;
-
-            return illustration;
         }
     }
     public class TextLineV : TextShape
@@ -73,17 +73,13 @@ namespace Unimage
                 position + (length < 0 ? new Vector(0, length + 1) : Vector.Zero),
                 new Vector(1, Math.Abs(length))) { }
 
-        public override char[,] Illustrate()
+        protected override void Illustrate(char[,] illustration)
         {
-            var illustration = new char[1, Size.Y];
-
             for (var y = 1; y < Size.Y - 1; y++)
                 illustration[0, y] = ChVrt;
 
             illustration[0, Size.Y - 1] = ChBot;
             illustration[0,          0] = ChTop;
-
-            return illustration;
         }
     }
 
@@ -112,10 +108,8 @@ namespace Unimage
             _content = content;
         }
 
-        public override char[,] Illustrate()
+        protected override void Illustrate(char[,] illustration)
         {
-            var illustration = new char[Size.X, Size.Y];
-
             illustration[         0,          0] = ChTopLft;
             illustration[         0, Size.Y - 1] = ChBotLft;
             illustration[Size.X - 1,          0] = ChTopRgt;
@@ -151,8 +145,6 @@ namespace Unimage
                     illustration[x, y] = column < line.Length ? line[column] : ' ';
                 }
             }
-
-            return illustration;
         }
     }
 }
