@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 
 namespace Unimage
@@ -18,24 +19,90 @@ namespace Unimage
         public abstract char[,] Illustrate();
     }
 
+    public class TextDot : TextShape
+    {
+        public char ChBdy { get; set; }
+
+        public TextDot(Vector position)
+            : base (position, new Vector(1, 1)) { }
+
+        public override char[,] Illustrate()
+        {
+            var illustration = new char[1, 1];
+
+            illustration[0, 0] = ChBdy;
+
+            return illustration;
+        }
+    }
+
+    public class TextLineH : TextShape
+    {
+        public char ChLft { get; set; }
+        public char ChRgt { get; set; }
+
+        public char ChHrz { get; set; }
+
+        public TextLineH(Vector position, int length)
+            : base(
+                position + (length < 0 ? new Vector(length + 1, 0) : Vector.Zero),
+                new Vector(Math.Abs(length), 1)) { }
+
+        public override char[,] Illustrate()
+        {
+            var illustration = new char[Size.X, 1];
+
+            for (var x = 1; x < Size.X - 1; x++)
+                illustration[x, 0] = ChHrz;
+
+            illustration[Size.X - 1, 0] = ChRgt;
+            illustration[         0, 0] = ChLft;
+
+            return illustration;
+        }
+    }
+    public class TextLineV : TextShape
+    {
+        public char ChTop { get; set; }
+        public char ChBot { get; set; }
+
+        public char ChVrt { get; set; }
+
+        public TextLineV(Vector position, int length)
+            : base(
+                position + (length < 0 ? new Vector(0, length + 1) : Vector.Zero),
+                new Vector(1, Math.Abs(length))) { }
+
+        public override char[,] Illustrate()
+        {
+            var illustration = new char[1, Size.Y];
+
+            for (var y = 1; y < Size.Y - 1; y++)
+                illustration[0, y] = ChVrt;
+
+            illustration[0, Size.Y - 1] = ChBot;
+            illustration[0,          0] = ChTop;
+
+            return illustration;
+        }
+    }
+
     public class TextRectangle : TextShape
     {
         private const int MARGIN_SIZE = 1;
 
         private readonly string[] _content;
 
-        public char TopLeft  { get; set; }
-        public char TopRight { get; set; }
+        public char ChTopLft { get; set; }
+        public char ChTopRgt { get; set; }
 
-        public char BottomLeft  { get; set; }
-        public char BottomRight { get; set; }
+        public char ChBotLft { get; set; }
+        public char ChBotRgt { get; set; }
 
-        public char HLine { get; set; }
-        public char VLine { get; set; }
+        public char ChHrz { get; set; }
+        public char ChVrt { get; set; }
 
-        public TextRectangle(
-            Vector position,
-            string[] content)
+        public TextRectangle(Vector position, string[] content)
             : base(
                 position,
                 new Vector(
@@ -49,25 +116,25 @@ namespace Unimage
         {
             var illustration = new char[Size.X, Size.Y];
 
-            illustration[         0,          0] = TopLeft;
-            illustration[         0, Size.Y - 1] = BottomLeft;
-            illustration[Size.X - 1,          0] = TopRight;
-            illustration[Size.X - 1, Size.Y - 1] = BottomRight;
+            illustration[         0,          0] = ChTopLft;
+            illustration[         0, Size.Y - 1] = ChBotLft;
+            illustration[Size.X - 1,          0] = ChTopRgt;
+            illustration[Size.X - 1, Size.Y - 1] = ChBotRgt;
 
             for (var x = 1; x < Size.X - 1; x++)
             {
-                illustration[x,          0] = HLine;
-                illustration[x, Size.Y - 1] = HLine;
+                illustration[x,          0] = ChHrz;
+                illustration[x, Size.Y - 1] = ChHrz;
             }
             for (var y = 1; y < Size.Y - 1; y++)
             {
-                illustration[         0, y] = VLine;
-                illustration[Size.X - 1, y] = VLine;
+                illustration[         0, y] = ChVrt;
+                illustration[Size.X - 1, y] = ChVrt;
 
-                for (var m = 0; m < MARGIN_SIZE; m++)
+                for (var m = 1; m <= MARGIN_SIZE; m++)
                 {
-                    illustration[         m + 1, y] = ' ';
-                    illustration[Size.X - m - 2, y] = ' ';
+                    illustration[             m, y] = ' ';
+                    illustration[Size.X - 1 - m, y] = ' ';
                 }
             }
 
